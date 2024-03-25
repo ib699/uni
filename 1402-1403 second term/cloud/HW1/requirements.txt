@@ -1,0 +1,6 @@
+flask
+requests
+pika
+boto3
+python-dotenv
+psycopg2
