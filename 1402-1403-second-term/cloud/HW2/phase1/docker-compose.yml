@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.12.2
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=12345
+    mem_limit: 6g
+    container_name: my_elasticsearch
+
+  redis:
+    image: redis:alpine3.19
+    ports:
+      - "6379:6379"
+    container_name: my-redis-container
+
+  my-python-app:
+    build: .
+    image: my-python-app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - elasticsearch
+      - redis

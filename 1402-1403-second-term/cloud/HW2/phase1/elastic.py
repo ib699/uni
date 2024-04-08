@@ -1,3 +1,5 @@
+import time
+
 import requests
 from dotenv import load_dotenv
 import os
@@ -10,23 +12,24 @@ def init_elastic():
     username = os.getenv('ELASTIC_USER')
     password = os.getenv('ELASTIC_PASS')
 
-    # Read the content of the 'movies.json' file
     with open("movies.json", 'r') as file:
         data = file.read()
 
-    # Set headers for the request
     headers = {
         'Content-Type': 'application/json'
     }
 
-    # Make the HTTP POST request to Elasticsearch
-    response = requests.post(url, auth=(username, password), headers=headers, data=data, verify=False)
+    cont = 400
+    while cont != 200:
+        try:
+            response = requests.post(url, auth=(username, password), headers=headers, data=data, verify=False)
+            cont = response.status_code
+        except Exception as e:
+            print(f"Failed to index data. Waiting 10 seconds..." )
+            time.sleep(10)
+            continue
 
-    # Check the response status
-    if response.status_code == 200:
-        print("Data successfully indexed in Elasticsearch.")
-    else:
-        print("Failed to index data. Status code:", response.status_code)
+    print("Data successfully indexed in Elasticsearch.")
 
 
 class Elastic:
@@ -59,7 +62,6 @@ class Elastic:
             return None
         else:
             return output
-
 
 # init_elastic()
 # test = Elastic()
