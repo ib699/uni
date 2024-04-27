@@ -47,7 +47,19 @@ def search():
         resp.append(api_resp)
         return resp
 
-    return print("-- found Nothing! --")
+    return "-- found Nothing! --"
+
+
+@app.route('/export_redis')
+def export_redis():
+    re.export_data()
+    return "exported redis"
+
+
+@app.route('/import_redis')
+def import_redis():
+    re.import_data()
+    return "imported redis"
 
 
 if __name__ == '__main__':
