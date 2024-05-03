@@ -17,26 +17,39 @@ void omp_check();
 void fill_array(int *a, size_t n);
 void prefix_sum(int *a, size_t n);
 void print_array(int *a, size_t n);
+void prefix_sum_omp_1_2thread(int *a, size_t n);
+void prefix_sum_omp_1_4thread(int *a, size_t n);
+void prefix_sum_omp_2(ll *a, size_t n);
+void prefix_sum_2(ll *a, size_t n);
+
 
 int main(int argc, char *argv[]) {
 	// Check for correct compilation settings
 	omp_check();
 	// Input N
-	size_t n = 0;
-	printf("[-] Please enter N: ");
-	scanf("%uld\n", &n);
+	size_t n = 50000000;
+	// printf("[-] Please enter N: ");
+	// scanf("%uld\n", &n);
 	// Allocate memory for array
 	int * a = (int *)malloc(n * sizeof a);
 	// Fill array with numbers 1..n
 	fill_array(a, n);
 	// Print array
-	print_array(a, n);
+	// print_array(a, n);
 	// Compute prefix sum
-	prefix_sum(a, n);
+
+	double start = omp_get_wtime();
+	// prefix_sum(a, n);
+	prefix_sum_omp_1_2thread(a, n);
+	double end = omp_get_wtime();
+
 	// Print array
-	print_array(a, n);
+	// print_array(a, n);
 	// Free allocated memory
 	free(a);
+
+	printf("Elapsed Time: %0.5lf\n", end - start);
+
 	return EXIT_SUCCESS;
 }
 
@@ -46,6 +59,86 @@ void prefix_sum(int *a, size_t n) {
 		a[i] = a[i] + a[i - 1];
 	}
 }
+
+void prefix_sum_omp_1_2thread(int *a, size_t n){
+	int i, j, step = n/2, mid = n/2;
+
+	#pragma omp parallel for num_threads(2) private(i, j)
+	for(i = 0; i < 2; i++){
+		for(j = 1 + i*step; j < (i+1)*step; j++){
+			a[j] = a[j] + a[j-1];
+		}
+	}
+
+	int extra = a[mid - 1], step_2 = n/4;
+
+	#pragma omp parallel for num_threads(2) private(i, j)
+	for(i = 0; i < 2; i++){
+		for(j = mid + i*step; j < mid + (i+1)*step; j++){
+			a[j] = a[j] + extra;
+		}
+	}
+}
+
+void prefix_sum_omp_1_4thread(int *a, size_t n){
+    int i, j, step = n/2, mid = n/2;
+
+	#pragma omp parallel for num_threads(4) private(i, j)
+	for(i = 0; i < 2; i++){
+		for(j = 1 + i*step; j < (i+1)*step; j++){
+			a[j] = a[j] + a[j-1];
+		}
+	}
+
+	int extra = a[mid - 1], step_2 = n/4;
+
+	#pragma omp parallel for num_threads(4) private(i, j)
+	for(i = 0; i < 2; i++){
+		for(j = mid + i*step; j < mid + (i+1)*step; j++){
+			a[j] = a[j] + extra;
+		}
+	}
+
+}
+
+void prefix_sum_2(ll *a, size_t n){
+  int step = 1, i, j;
+  ll * b = (ll *)malloc(n * sizeof b);
+  for(i = 0; i < n; i++)
+      b[i] = a[i];
+
+  while(step < n){
+    for(i = 0; i + step < n; i++)
+      b[i+step] = a[i] + a[i+step];
+    
+    for(i = step; i < n; i++)
+      a[i] = b[i];
+    
+    step *= 2;
+  }
+
+}
+
+void prefix_sum_omp_2(ll *a, size_t n){
+  int step = 1, i, j, to;
+  ll * b = (ll *)malloc(n * sizeof b);
+  for(i = 0; i < n; i++)
+      b[i] = a[i];
+
+  while(step < n){
+    to = n - step;
+    #pragma omp parallel for num_threads(2) private(i)
+    for(i = 0; i < to; i++){
+      b[i+step] = a[i] + a[i+step];
+    }
+    
+    for(i = step; i < n; i++)
+      a[i] = b[i];
+    
+    step *= 2;
+  }
+}
+
 
 void print_array(int *a, size_t n) {
 	int i;
