@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # I use arch u use arch to
+
 sudo pacman -Syu
 sudo pacman -S postgresql
 sudo -iu postgres initdb --locale $LANG -E UTF8 -D '/var/lib/postgres/data'
@@ -26,3 +27,5 @@ SELECT * FROM users;
 SELECT * FROM baskets;
 
 EOF
+
+go build github.com/ib699/mid
