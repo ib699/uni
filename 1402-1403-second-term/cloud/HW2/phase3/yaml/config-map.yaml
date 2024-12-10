@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-configmap
+data:
+    env.json: |
+    {
+      "REDIS_HOST": "redis",
+      "ELASTICSEARCH_HOST": "elasticsearch",
+      "ELASTICSEARCH_USER": "elasti",
+      "ELASTICSEARCH_PASS": "12345"
+    }

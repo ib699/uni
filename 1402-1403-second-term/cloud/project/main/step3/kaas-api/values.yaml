@@ -1,0 +1,26 @@
+replicas: 2
+
+app:
+  name: kaas-api
+
+image:
+  repository: nginx
+  tag: latest
+
+service:
+  type: ClusterIP
+  port: 80
+
+
+ingress:
+  host: kaas.example.com
+  tlsSecretName: kaas-api-tls
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+

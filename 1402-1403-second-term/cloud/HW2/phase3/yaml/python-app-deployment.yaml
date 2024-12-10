@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+      - name: python-app
+        image: isedighi/cloud
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ELASTICSEARCH_URL
+          value: "elasticsearch-service:9200"
+        - name: REDIS_URL
+          value: "redis-service:6379"
+        volumeMounts:
+        - name: my-volume
+          mountPath: /root/Documents/redis
+      volumes:
+      - name: my-volume
+        persistentVolumeClaim:
+          claimName: my-pvc
+
